@@ -71,11 +71,6 @@ clustering(
   delimiter=',')
 ```
 
-## License
-
-Please find the license in the LICENSE file.
-By choosing the license, noo other licenses needed to be taken into account, because there are no dependencies for this tool.
-
 ## Contact
 
 Sven Lieber - Sven.Lieber@kbr.be - Royal Library of Belgium (KBR) - https://www.kbr.be/en/
