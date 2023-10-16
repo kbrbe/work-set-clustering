@@ -1,5 +1,7 @@
 # Work-set Clustering
 
+[![DOI](https://zenodo.org/badge/705721988.svg)](https://zenodo.org/doi/10.5281/zenodo.10011416)
+
 A Python script to perform a clustering based on descriptive keys.
 It can be used to identify _work_ clusters for _manifestations_ according to the FRBR (IFLA-LRM) model.
 
