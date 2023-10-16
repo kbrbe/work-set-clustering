@@ -1,6 +1,9 @@
 # Work-set Clustering
 
 A Python script to perform a clustering based on descriptive keys.
+It can be used to identify _work_ clusters for _manifestations_ according to the FRBR (IFLA-LRM) model.
+
+This tool only performs the clustering. It needs a list of manifestation identifiers and their descriptive keys as input.
 
 
 ## Usage via the command line
@@ -70,7 +73,8 @@ clustering(
 
 ## License
 
-No other licenses needed to be taken into account, because there are no dependencies for this tool.
+Please find the license in the LICENSE file.
+By choosing the license, noo other licenses needed to be taken into account, because there are no dependencies for this tool.
 
 ## Contact
 
