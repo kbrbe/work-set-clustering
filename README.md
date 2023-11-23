@@ -67,7 +67,7 @@ python -m work_set_clustering.clustering \
 Example CSV which should result in two clusters, one for book1 and book2 (due to a similar key) and one for book3:
 
 |elementID|descriptiveKey|
-|=========|==============|
+|---------|--------------|
 |book1|theTitle/author1|
 |book1|isbnOfTheBook/author1|
 |book2|isbnOfTheBook/author1|
