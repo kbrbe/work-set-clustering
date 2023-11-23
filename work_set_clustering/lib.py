@@ -38,6 +38,30 @@ def addElementsToCluster(elements, clusterID, clusters, elementToCluster):
   for element in elements:
     elementToCluster[element] = clusterID
 
+# -----------------------------------------------------------------------------
+def buildInvertedIndex(descriptiveKeys):
+  """This function builds the inverted index based on which the clustering is happening.
+
+  >>> keys0 = {'e1': set(['key1','key2']), 'e2': set(['key3', 'key4']), 'e3': set(['key2'])}
+  >>> index = buildInvertedIndex(keys0)
+  >>> sorted(index['key1'])
+  ['e1']
+  >>> sorted(index['key2'])
+  ['e1', 'e3']
+  >>> sorted(index['key3'])
+  ['e2']
+  >>> sorted(index['key4'])
+  ['e2']
+  """
+
+  keysToElements = {}
+  for elementID, dKeys in descriptiveKeys.items():
+    for dKey in dKeys:
+      if dKey in keysToElements:
+        keysToElements[dKey].add(elementID)
+      else:
+        keysToElements[dKey] = set([elementID])
+  return keysToElements
 
 
 # -----------------------------------------------------------------------------
