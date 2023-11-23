@@ -22,6 +22,25 @@ def checkIfColumnsExist(inputColumnNames, outputColumnNames):
         return True
 
 # -----------------------------------------------------------------------------
+def addElementsToCluster(elements, clusterID, clusters, elementToCluster):
+  """This function adds a mapping between elements and their cluster to the provided lookup data structures.
+
+  >>> elements = set(['e3','e4'])
+  >>> clusters = {'c1': set(['e1','e2'])}
+  >>> elementToCluster = {'e1': 'c1', 'e2': 'c1'}
+  >>> addElementsToCluster(elements, 'c1', clusters, elementToCluster)
+  >>> sorted(clusters['c1'])
+  ['e1', 'e2', 'e3', 'e4']
+  >>> elementToCluster['e3']
+  'c1'
+  """
+  clusters[clusterID].update(elements)
+  for element in elements:
+    elementToCluster[element] = clusterID
+
+
+
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
   import doctest
   doctest.testmod()

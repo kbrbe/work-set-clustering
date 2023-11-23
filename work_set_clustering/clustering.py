@@ -30,13 +30,6 @@ def main(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter):
 
     print("finished")
 
-
-# -----------------------------------------------------------------------------
-def addElementsToCluster(elements, clusterID, clusters, elementToCluster):
-  clusters[clusterID].update(elements)
-  for element in elements:
-    elementToCluster[element] = clusterID
-
 # -----------------------------------------------------------------------------
 def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
 
@@ -73,7 +66,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
       if len(elementsInNoCluster) > 0:
         # some of the elements are not yet in the cluster
         clusterID = existingClusters.pop()
-        addElementsToCluster(elementsInNoCluster, clusterID, clusters, elementToCluster)
+        lib.addElementsToCluster(elementsInNoCluster, clusterID, clusters, elementToCluster)
     else:
       newClusterID = str(uuid.uuid4())
 
@@ -84,7 +77,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
           elementToCluster[element] = newClusterID
 
         if len(elementsInNoCluster) > 0:
-          addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
+          lib.addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
 
       elif len(existingClusters) > 1:
         # the members are in more than one cluster, so those clusters should be merged
@@ -102,7 +95,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
 
         # 5. now that the new cluster is created we can add eventually clusterless elements
         if len(elementsInNoCluster) > 0:
-          addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
+          lib.addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
 
   end_time_clustering = time.time()
   diffTimeClustering = time.strftime('%H:%M:%S', time.gmtime(end_time_clustering - start_time_clustering))
