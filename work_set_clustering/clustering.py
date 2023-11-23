@@ -10,7 +10,7 @@ import uuid
 import time
 
 # -----------------------------------------------------------------------------
-def main(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter):
+def clusterFromScratch(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter):
   """This script performs a clustering of the input data based on common descriptive keys."""
 
   with open(inputFilename, 'r') as inFile, \
@@ -22,42 +22,71 @@ def main(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter):
     elementIDs = set()
     descriptiveKeys = {}
 
-    # Populate the two data structures above with values from the input file
+    # Populate elementIDs and descriptiveKeys with values from the input file
     # A sorted list of element identifiers is returned based on the given elementIDs set
     elementIDs = readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    keysToElements = createInvertedIndexAndLogTime(descriptiveKeys)
 
-    clusterInvertedIndex(elementIDs, descriptiveKeys, outFile)
+    # for initial clustering these two should be empty
+    clusters = {}
+    elementToCluster = {}
 
-    print("finished")
+    clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
+
+# -----------------------------------------------------------------------------
+def updateClusters(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter, existingClustersFilename, existingClusterKeysFilename):
+  """This script performs a clustering of the input data based on common descriptive keys."""
+
+  with open(inputFilename, 'r') as inFile, \
+       open(existingClustersFilename, 'r') as existingClustersFile, \
+       open(existingClusterKeysFilename, 'r') as existingClusterKeysFile, \
+       open(outputFilename, 'w') as outFile:
+
+    inputReader = csv.DictReader(inFile, delimiter=delimiter)
+    existingClustersReader = csv.DictReader(existingClustersFile, delimiter=delimiter)
+    existingClusterKeysReader = csv.DictReader(existingClusterKeysFile, delimiter=delimiter)
+
+    lib.checkIfColumnsExist(inputReader.fieldnames, [idColumnName, keyColumnName])
+    lib.checkIfColumnsExist(existingClustersReader.fieldnames, ['elementID','clusterID'])
+    lib.checkIfColumnsExist(existingClusterKeysReader.fieldnames, [idColumnName, keyColumnName])
+
+    elementIDs = set()
+    descriptiveKeys = {}
+
+    # Populate elementIDs and descriptiveKeys with values from the input file
+    # A sorted list of element identifiers is returned based on the given elementIDs set
+    elementIDs = set(readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName))
+
+    # Add descriptive key data from existing clusters
+    elementIDs = readElements(existingClusterKeysReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    keysToElements = createInvertedIndexAndLogTime(descriptiveKeys)
+
+    clusters = {}
+    elementToCluster = {}
+    readClusters(existingClustersReader, clusters, elementToCluster)
+
+    clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
+
+
 
 
 # -----------------------------------------------------------------------------
-def addElementsToCluster(elements, clusterID, clusters, elementToCluster):
-  clusters[clusterID].update(elements)
-  for element in elements:
-    elementToCluster[element] = clusterID
-
-# -----------------------------------------------------------------------------
-def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
-
+def createInvertedIndexAndLogTime(descriptiveKeys):
   start_time_index = time.time()
-  keysToElements = {}
-  for elementID, dKeys in descriptiveKeys.items():
-    for dKey in dKeys:
-      if dKey in keysToElements:
-        keysToElements[dKey].add(elementID)
-      else:
-        keysToElements[dKey] = set([elementID])
-
+  keysToElements = lib.buildInvertedIndex(descriptiveKeys)
   end_time_index = time.time()
   diffTimeIndex = time.strftime('%H:%M:%S', time.gmtime(end_time_index - start_time_index))
   print(f'Inverted index computed in {diffTimeIndex}')
+  return keysToElements
+
+# -----------------------------------------------------------------------------
+def clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile):
 
   start_time_clustering = time.time()
-  clusters = {}
-  elementToCluster = {}
 
   for dKey, elementIDs in keysToElements.items():
+
+    # two helper data structures for the current iteration
     existingClusters = set()
     elementsInNoCluster = set()
 
@@ -73,7 +102,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
       if len(elementsInNoCluster) > 0:
         # some of the elements are not yet in the cluster
         clusterID = existingClusters.pop()
-        addElementsToCluster(elementsInNoCluster, clusterID, clusters, elementToCluster)
+        lib.addElementsToCluster(elementsInNoCluster, clusterID, clusters, elementToCluster)
     else:
       newClusterID = str(uuid.uuid4())
 
@@ -84,7 +113,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
           elementToCluster[element] = newClusterID
 
         if len(elementsInNoCluster) > 0:
-          addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
+          lib.addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
 
       elif len(existingClusters) > 1:
         # the members are in more than one cluster, so those clusters should be merged
@@ -102,7 +131,7 @@ def clusterInvertedIndex(elementIDs, descriptiveKeys, outFile):
 
         # 5. now that the new cluster is created we can add eventually clusterless elements
         if len(elementsInNoCluster) > 0:
-          addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
+          lib.addElementsToCluster(elementsInNoCluster, newClusterID, clusters, elementToCluster)
 
   end_time_clustering = time.time()
   diffTimeClustering = time.strftime('%H:%M:%S', time.gmtime(end_time_clustering - start_time_clustering))
@@ -133,6 +162,16 @@ def readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColu
 
   return sorted(elementIDs)
 
+# -----------------------------------------------------------------------------
+def readClusters(inputReader, clusters, elementToCluster):
+
+  for row in inputReader:
+    eID = row['elementID']
+    cID = row['clusterID']
+    if cID not in clusters:
+      clusters[cID] = set()
+    lib.addElementsToCluster([eID], cID, clusters, elementToCluster)
+
 
 # -----------------------------------------------------------------------------
 def parseArguments():
@@ -143,12 +182,27 @@ def parseArguments():
   parser.add_argument('--id-column', action='store', required=True, help='The name of the column with element identifiers')
   parser.add_argument('--key-column', action='store', required=True, help="The name of the column that contains a descriptive key")
   parser.add_argument('--delimiter', action='store', default=',', help="Optional delimiter of the input/output CSV, default is ','")
+  parser.add_argument('--existing-clusters', action='store', help="Optional file with existing element-cluster mapping")
+  parser.add_argument('--existing-clusters-keys', action='store', help="Optional file with element-descriptive key mapping for existing clusters mapping")
   options = parser.parse_args()
+
+  if options.existing_clusters and not options.existing_clusters_keys:
+    print()
+    print(f'Existing clusters provided, but no file with descriptive keys for its elements')
+    exit(1)
+
+  if options.existing_clusters_keys and not options.existing_clusters:
+    print()
+    print(f'Descriptive keys for elements of existing clusters provided, but no file with existing cluster keys')
+    exit(1)
 
   return options
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
   options = parseArguments()
-  main(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter)
+  if options.existing_clusters:
+    clusterFromScratch(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter)
+  else:
+    updateClusters(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter, options.existing_clusters, options.existing_clusters_keys)
  
