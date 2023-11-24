@@ -4,6 +4,9 @@ py-work-set-clustering/
 # actual data
 *.csv
 
+# exception for test case data
+!test/resources/*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
