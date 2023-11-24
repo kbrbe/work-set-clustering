@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "work_set_clustering",
-    version = "0.1.0",
+    version = "0.2.0",
     author = "Sven Lieber",
     author_email = "Sven.Lieber@kbr.be",
     description = ("A Python script to perform a clustering based on descriptive keys."),
