@@ -202,7 +202,7 @@ def parseArguments():
 if __name__ == '__main__':
   options = parseArguments()
   if options.existing_clusters:
-    clusterFromScratch(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter)
-  else:
     updateClusters(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter, options.existing_clusters, options.existing_clusters_keys)
+  else:
+    clusterFromScratch(options.input_file, options.output_file, options.id_column, options.key_column, options.delimiter)
  
