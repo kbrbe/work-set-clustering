@@ -10,21 +10,27 @@ import uuid
 import time
 
 # -----------------------------------------------------------------------------
-def clusterFromScratch(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter):
+def clusterFromScratch(inputFilenames, outputFilename, idColumnName, keyColumnName, delimiter):
   """This script performs a clustering of the input data based on common descriptive keys."""
 
-  with open(inputFilename, 'r') as inFile, \
-       open(outputFilename, 'w') as outFile:
-
-    inputReader = csv.DictReader(inFile, delimiter=delimiter)
-    lib.checkIfColumnsExist(inputReader.fieldnames, [idColumnName, keyColumnName])
+  with open(outputFilename, 'w') as outFile:
 
     elementIDs = set()
     descriptiveKeys = {}
 
-    # Populate elementIDs and descriptiveKeys with values from the input file
-    # A sorted list of element identifiers is returned based on the given elementIDs set
-    elementIDs = readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    for inputFilename in inputFilenames:
+      with open(inputFilename, 'r') as inFile: 
+        inputReader = csv.DictReader(inFile, delimiter=delimiter)
+        lib.checkIfColumnsExist(inputReader.fieldnames, [idColumnName, keyColumnName])
+
+
+        # Populate elementIDs and descriptiveKeys with values from the input file
+        # A sorted list of element identifiers is returned based on the given elementIDs set
+        currentElementIDs = readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+
+        # update the list of all elements with the ones from the current file
+        elementIDs.update(currentElementIDs)
+
     keysToElements = createInvertedIndexAndLogTime(descriptiveKeys)
 
     # for initial clustering these two should be empty
@@ -34,38 +40,43 @@ def clusterFromScratch(inputFilename, outputFilename, idColumnName, keyColumnNam
     clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
 
 # -----------------------------------------------------------------------------
-def updateClusters(inputFilename, outputFilename, idColumnName, keyColumnName, delimiter, existingClustersFilename, existingClusterKeysFilename):
+def updateClusters(inputFilenames, outputFilename, idColumnName, keyColumnName, delimiter, existingClustersFilename, existingClusterKeysFilename):
   """This script performs a clustering of the input data based on common descriptive keys."""
 
-  with open(inputFilename, 'r') as inFile, \
-       open(existingClustersFilename, 'r') as existingClustersFile, \
+  with open(existingClustersFilename, 'r') as existingClustersFile, \
        open(existingClusterKeysFilename, 'r') as existingClusterKeysFile, \
        open(outputFilename, 'w') as outFile:
-
-    inputReader = csv.DictReader(inFile, delimiter=delimiter)
-    existingClustersReader = csv.DictReader(existingClustersFile, delimiter=delimiter)
-    existingClusterKeysReader = csv.DictReader(existingClusterKeysFile, delimiter=delimiter)
-
-    lib.checkIfColumnsExist(inputReader.fieldnames, [idColumnName, keyColumnName])
-    lib.checkIfColumnsExist(existingClustersReader.fieldnames, ['elementID','clusterID'])
-    lib.checkIfColumnsExist(existingClusterKeysReader.fieldnames, [idColumnName, keyColumnName])
 
     elementIDs = set()
     descriptiveKeys = {}
 
-    # Populate elementIDs and descriptiveKeys with values from the input file
-    # A sorted list of element identifiers is returned based on the given elementIDs set
-    elementIDs = set(readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName))
+    for inputFilename in inputFilenames:
+      with open(inputFilename, 'r') as inFile: 
+        inputReader = csv.DictReader(inFile, delimiter=delimiter)
+        lib.checkIfColumnsExist(inputReader.fieldnames, [idColumnName, keyColumnName])
+
+        # Populate elementIDs and descriptiveKeys with values from the input file
+        # A sorted list of element identifiers is returned based on the given elementIDs set
+        currentElementIDs = set(readElements(inputReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName))
+
+        # update the list of all elements with the ones from the current file
+        elementIDs.update(currentElementIDs)
+
+    existingClustersReader = csv.DictReader(existingClustersFile, delimiter=delimiter)
+    existingClusterKeysReader = csv.DictReader(existingClusterKeysFile, delimiter=delimiter)
+
+    lib.checkIfColumnsExist(existingClustersReader.fieldnames, ['elementID','clusterID'])
+    lib.checkIfColumnsExist(existingClusterKeysReader.fieldnames, [idColumnName, keyColumnName])
 
     # Add descriptive key data from existing clusters
-    elementIDs = readElements(existingClusterKeysReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    allElementIDs = readElements(existingClusterKeysReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
     keysToElements = createInvertedIndexAndLogTime(descriptiveKeys)
 
     clusters = {}
     elementToCluster = {}
     readClusters(existingClustersReader, clusters, elementToCluster)
 
-    clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
+    clusterInvertedIndex(allElementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
 
 
 
@@ -177,7 +188,7 @@ def readClusters(inputReader, clusters, elementToCluster):
 def parseArguments():
 
   parser = argparse.ArgumentParser()
-  parser.add_argument('-i', '--input-file', action='store', required=True, help="The CSV file with columns for elements and descriptive keys, one row is one element and descriptive key relationship")
+  parser.add_argument('-i', '--input-file', action='append', required=True, help="The CSV file(s) with columns for elements and descriptive keys, one row is one element and descriptive key relationship")
   parser.add_argument('-o', '--output-file', action='store', required=True, help='The name of the output CSV file containing two columns: elementID and clusterID')
   parser.add_argument('--id-column', action='store', required=True, help='The name of the column with element identifiers')
   parser.add_argument('--key-column', action='store', required=True, help="The name of the column that contains a descriptive key")

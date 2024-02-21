@@ -35,7 +35,7 @@ usage: clustering.py [-h] -i INPUT_FILE -o OUTPUT_FILE --id-column ID_COLUMN --k
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT_FILE, --input-file INPUT_FILE
-                        The CSV file with columns for elements and descriptive keys, one row is one element and descriptive key relationship
+                        The CSV file(s) with columns for elements and descriptive keys, one row is one element and descriptive key relationship
   -o OUTPUT_FILE, --output-file OUTPUT_FILE
                         The name of the output CSV file containing two columns: elementID and clusterID
   --id-column ID_COLUMN
@@ -73,6 +73,10 @@ Example CSV which should result in two clusters, one for book1 and book2 (due to
 |book2|isbnOfTheBook/author1|
 |book3|otherBookTitle/author1|
 
+The script can also read descriptive keys that are distributed across several files.
+Therefore you only have to use the `--input-file` parameter several times.
+Please note that all of those input files should have the same column names specified with `--id-column` and `--key-column`.
+
 You can find more examples of cluster input in the `test/resources` directory.
 
 ### Reuse existing clusters
@@ -94,6 +98,8 @@ python -m work_set_clustering.clustering \
 Please note that with the two parameters `--existing-clusters` and `--existing-cluster-keys`
 the data from a previous run are provided.
 
+Similar to the initial clustering, you can provide several input files.
+
 ## Usage as a library
 
 The tool can also be used as a library within another Python script or a Jupyter notebook.
@@ -102,7 +108,7 @@ The tool can also be used as a library within another Python script or a Jupyter
 from work_set_clustering.clustering import clusterFromScratch as clustering
 
 clustering(
-  inputFilename="descriptive-keys.csv",
+  inputFilename=["descriptive-keys.csv"],
   outputFilename="cluster-assignments.csv",
   idColumnName="elementID",
   keyColumnName="descriptiveKey",
@@ -115,7 +121,7 @@ Or if you want to reuse existing clusters:
 from work_set_clustering.clustering import updateClusters as clustering
 
 clustering(
-  inputFilename="descriptive-keys.csv",
+  inputFilename=["descriptive-keys.csv"],
   outputFilename="cluster-assignments.csv",
   idColumnName="elementID",
   keyColumnName="descriptiveKey",
@@ -124,6 +130,10 @@ clustering(
   existingClusterKeysFilename="initial-descriptive-keys.csv")
 ```
 
+## Software Tests
+
+* You can execute the unit tests of the `lib.py` file with the following command: `python work_set_clustering.lib`.
+* You can execute the integration tests with the following command: `python -m unittest discover -s test`
 
 ## Contact
 
