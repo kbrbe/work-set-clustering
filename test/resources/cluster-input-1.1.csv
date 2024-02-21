@@ -1,0 +1,9 @@
+"elementID","descriptiveKey"
+"e1","bookTitle1/John"
+"e1","123-456/John"
+"e1","bookTitle1/Jane"
+"e1","123-456/Jane"
+"e2","123-456/John"
+"e2","slightly-different-title/John"
+"e2","slightly-different-title/Jane"
+
