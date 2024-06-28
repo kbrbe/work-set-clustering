@@ -21,3 +21,6 @@ Therefore we use the file `clusters-1-overlap.csv` where we get the clusters `c1
 
 Please note that `e3` and `e4` still share descriptive keys according to the file `cluster-input-1.csv`.
 Whether or not we reuse the existing keys will influence the outcome.
+
+* When reusing descriptive keys we should get the clusters as usual `c1: (e1, e2)`, `(e3, e4, e6)`, `(e7)`. Please not that neither the cluster identifier `c2` nor `c3` are reused, since their members end up in the same cluster which will get a new random identifier
+* When not reusing the keys we should get the clusters `c1: (e1, e2)`, `c2: (e3)`, `c3: (e4)`, `(e5)`, `(e6)`, `(e7)`

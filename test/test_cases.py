@@ -81,4 +81,88 @@ class UpdateClusteringElementsTogether():
     elementsOfCluster = self.getUpdatedClusterData()['clusterToElement'][clusterOfE7]
     self.assertEqual(len(elementsOfCluster), 1, msg=f'Other elements in the cluster of e7: {elementsOfCluster}')
 
+# -----------------------------------------------------------------------------
+class UpdateClusteringNotReusingKeysElementsTogether():
+  """A class with integration test cases for updated clusters when descriptive keys are not reused and no new elements can be added to existing clusters via keys."""
+
+  # ---------------------------------------------------------------------------
+  def testElement1And2Together(self):
+    """Elements e1 and e2 are in one cluster according to the user"""
+    clusterInitial = self.getUpdatedClusterData()['elementToCluster']['e1']
+    clusterNew = self.getUpdatedClusterData()['elementToCluster']['e2']
+    self.assertEqual(clusterInitial, clusterNew, msg=f'Different clusters for e1 and e2 ({clusterInitial} != {clusterNew})')
+
+  # ---------------------------------------------------------------------------
+  def testElement3Alone(self):
+    """Element e3 should have its own cluster, even though there is an overlap via descriptive keys with e4"""
+    clusterElements = self.getUpdatedClusterData()['clusterToElement']['c2']
+    expectedNumber = 1
+    self.assertEqual(len(clusterElements), expectedNumber, msg=f'Element e3 is not alone in its cluster {clusterElements}')
+
+  # ---------------------------------------------------------------------------
+  def testElement3InC2(self):
+    """Element e3 should be in the cluster with identifier c3"""
+    clusterInitial = self.getUpdatedClusterData()['elementToCluster']['e3']
+    clusterNew = "c2"
+    self.assertEqual(clusterInitial, clusterNew, msg=f'Cluster of e3 is not {clusterNew} ({clusterInitial} != {clusterNew})')
+
+  # ---------------------------------------------------------------------------
+  def testElement4Alone(self):
+    """Element e4 should have its own cluster, even though there is an overlap via descriptive keys with e4"""
+    clusterElements = self.getUpdatedClusterData()['clusterToElement']['c3']
+    expectedNumber = 1
+    self.assertEqual(len(clusterElements), expectedNumber, msg=f'Element e4 is not alone in its cluster {clusterElements}')
+
+  # ---------------------------------------------------------------------------
+  def testElement4InC3(self):
+    """Element e4 should be in the cluster with identifier c3"""
+    clusterInitial = self.getUpdatedClusterData()['elementToCluster']['e4']
+    clusterNew = "c3"
+    self.assertEqual(clusterInitial, clusterNew, msg=f'Cluster of e4 is not {clusterNew} ({clusterInitial} != {clusterNew})')
+
+  # ---------------------------------------------------------------------------
+  def testElement5Alone(self):
+    """New element e5 should have its own cluster, even though there is an overlap via descriptive keys with existing elements"""
+    data = self.getUpdatedClusterData()
+    clusterElements = data['clusterToElement'][data['elementToCluster']['e5']]
+    expectedNumber = 1
+    self.assertEqual(len(clusterElements), expectedNumber, msg=f'Element e4 is not alone in its cluster {clusterElements}')
+
+  # ---------------------------------------------------------------------------
+  def testElement5InRandomClusterID(self):
+    """Element e5 should be in the cluster with a new random identifier"""
+    clusterID = self.getUpdatedClusterData()['elementToCluster']['e5']
+    knownClusterIDs = ['c1', 'c2', 'c3']
+    self.assertTrue(clusterID not in knownClusterIDs, msg=f'Cluster of e5 should have a new random ID, but it is an existing clusterID ({clusterID})')
+
+  # ---------------------------------------------------------------------------
+  def testElement6Alone(self):
+    """New element e6 should have its own cluster, even though there is an overlap via descriptive keys with existing elements"""
+    data = self.getUpdatedClusterData()
+    clusterElements = data['clusterToElement'][data['elementToCluster']['e6']]
+    expectedNumber = 1
+    self.assertEqual(len(clusterElements), expectedNumber, msg=f'Element e6 is not alone in its cluster {clusterElements}')
+
+  # ---------------------------------------------------------------------------
+  def testElement6InRandomClusterID(self):
+    """Element e6 should be in the cluster with a new random identifier"""
+    clusterID = self.getUpdatedClusterData()['elementToCluster']['e6']
+    knownClusterIDs = ['c1', 'c2', 'c3']
+    self.assertTrue(clusterID not in knownClusterIDs, msg=f'Cluster of e6 should have a new random ID, but it is an existing clusterID ({clusterID})')
+
+  # ---------------------------------------------------------------------------
+  def testElement7Alone(self):
+    """New element e7 should have its own cluster, even though there is an overlap via descriptive keys with existing elements"""
+    data = self.getUpdatedClusterData()
+    clusterElements = data['clusterToElement'][data['elementToCluster']['e7']]
+    expectedNumber = 1
+    self.assertEqual(len(clusterElements), expectedNumber, msg=f'Element e7 is not alone in its cluster {clusterElements}')
+
+  # ---------------------------------------------------------------------------
+  def testElement7InRandomClusterID(self):
+    """Element e7 should be in the cluster with a new random identifier"""
+    clusterID = self.getUpdatedClusterData()['elementToCluster']['e7']
+    knownClusterIDs = ['c1', 'c2', 'c3']
+    self.assertTrue(clusterID not in knownClusterIDs, msg=f'Cluster of e7 should have a new random ID, but it is an existing clusterID ({clusterID})')
+
 
