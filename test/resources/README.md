@@ -13,7 +13,7 @@ and `e7` will form its own cluster with a single element `(e7)`, because it does
 When for an update we consider the file `clusters-1.csv` (representing a correct clustering of the first input) with the following clusters and identifiers `c1: (e1, e2)` and `c2: (e3, e4)`
 we expect that the mentioned cluster identifiers `c1` and `c2` are reused.
 
-# Different clusters based on human judgement, despite overlapping descriptive keys
+## Different clusters based on human judgement, despite overlapping descriptive keys
 
 However, we also want to test what happens if due to a human assignment, elements are clustered differently despite of overlapping descriptive keys (https://github.com/kbrbe/work-set-clustering/issues/9)
 
