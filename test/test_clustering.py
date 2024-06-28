@@ -67,6 +67,20 @@ class TestClustering():
     self.assertEqual(clusterInitial, clusterNew, msg=f'Different clusters for initial e1 and updated e5 ({clusterInitial} != {clusterNew})')
 
   # ---------------------------------------------------------------------------
+  def testElement1SameClusterAfterUpdate(self):
+    """Element e1 should have the same clusterID after update when e5 was added"""
+    clusterInitial = self.getUpdatedClusterData()['elementToCluster']['e1']
+    clusterNew = "c1"
+    self.assertEqual(clusterInitial, clusterNew, msg=f'Initial cluster of e1 has changed after update ({clusterInitial} != {clusterNew})')
+
+  # ---------------------------------------------------------------------------
+  def testElement5SameClusterAfterUpdate(self):
+    """Element e5 should be in the same clusterID as the initial e1"""
+    clusterID = self.getUpdatedClusterData()['elementToCluster']['e5']
+    clusterExpected = "c1"
+    self.assertEqual(clusterID, clusterExpected, msg=f'Element e5 was not added to the existing clusterID of e1 ({clusterID} != {clusterExpected})')
+
+  # ---------------------------------------------------------------------------
   def testElement2And5Together(self):
     """Element e5 should be clustered together with the initial e1 and e2"""
     clusterInitial = self.getUpdatedClusterData()['elementToCluster']['e2']
