@@ -11,6 +11,7 @@ Reusable test cases grouped in classes are defined in the file `test_cases.py`
 * UpdateClusteringSize
 * UpdateClusteringElementsTogether
 * UpdateClusteringSizeReusing
+* UpdateClusteringNotReusingKeysElementsTogether
 
 
 ## Test cases
@@ -31,3 +32,4 @@ Update of clusters `clusters-1-overlap.csv` with `cluster-input-2.csv`
 
 ### TestClusterOverlappingKeysDifferentClustersReusingKeys
 Update of clusters `clusters-1-overlap.csv` with `cluster-input-2.csv` by also reusing descriptive keys `cluster-input-1.csv`
+
