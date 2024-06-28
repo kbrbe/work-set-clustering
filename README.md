@@ -82,7 +82,7 @@ You can find more examples of cluster input in the `test/resources` directory.
 ### Reuse existing clusters
 
 You can reuse the clusters created from an earlier run,
-but you also have to provide the mapping between the previous elements and their descriptive keys.
+but you also have to provide the mapping between the previous elements and optionally their descriptive keys.
 
 
 ```python
@@ -99,6 +99,9 @@ Please note that with the two parameters `--existing-clusters` and `--existing-c
 the data from a previous run are provided.
 
 Similar to the initial clustering, you can provide several input files.
+
+> [!NOTE]
+> When skipping existing descriptive keys, existing cluster identifiers and assigments are kept, even if their elements have overlapping descriptive keys. Additionally, none of the new elements can be mapped to the existing clusters, because no descriptive keys are provided (more info in https://github.com/kbrbe/work-set-clustering/issues/9)
 
 ## Usage as a library
 

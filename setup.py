@@ -6,7 +6,7 @@ def read(fname):
 
 setuptools.setup(
     name = "work_set_clustering",
-    version = "0.3.0",
+    version = "0.4.0",
     url = "https://github.com/kbrbe/work-set-clustering",
     author = "Sven Lieber",
     author_email = "Sven.Lieber@kbr.be",

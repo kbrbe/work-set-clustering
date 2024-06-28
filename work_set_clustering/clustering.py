@@ -40,11 +40,10 @@ def clusterFromScratch(inputFilenames, outputFilename, idColumnName, keyColumnNa
     clusterInvertedIndex(elementIDs, descriptiveKeys, clusters, elementToCluster, keysToElements, outFile)
 
 # -----------------------------------------------------------------------------
-def updateClusters(inputFilenames, outputFilename, idColumnName, keyColumnName, delimiter, existingClustersFilename, existingClusterKeysFilename):
+def updateClusters(inputFilenames, outputFilename, idColumnName, keyColumnName, delimiter, existingClustersFilename, existingClusterKeysFilename=None):
   """This script performs a clustering of the input data based on common descriptive keys."""
 
   with open(existingClustersFilename, 'r') as existingClustersFile, \
-       open(existingClusterKeysFilename, 'r') as existingClusterKeysFile, \
        open(outputFilename, 'w') as outFile:
 
     elementIDs = set()
@@ -63,15 +62,21 @@ def updateClusters(inputFilenames, outputFilename, idColumnName, keyColumnName, 
         elementIDs.update(currentElementIDs)
 
     existingClustersReader = csv.DictReader(existingClustersFile, delimiter=delimiter)
-    existingClusterKeysReader = csv.DictReader(existingClusterKeysFile, delimiter=delimiter)
-
     lib.checkIfColumnsExist(existingClustersReader.fieldnames, ['elementID','clusterID'])
-    lib.checkIfColumnsExist(existingClusterKeysReader.fieldnames, [idColumnName, keyColumnName])
 
-    # Add descriptive key data from existing clusters
-    allElementIDs = readElements(existingClusterKeysReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    # Process optional existing descriptive keys
+    if existingClusterKeysFilename:
+      with open(existingClusterKeysFilename, 'r') as existingClusterKeysFile:
+        existingClusterKeysReader = csv.DictReader(existingClusterKeysFile, delimiter=delimiter)
+        lib.checkIfColumnsExist(existingClusterKeysReader.fieldnames, [idColumnName, keyColumnName])
+
+        # Add descriptive key data from existing clusters (populating data structures elementIDs and descriptiveKeys
+        allElementIDs = readElements(existingClusterKeysReader, elementIDs, descriptiveKeys, idColumnName, keyColumnName)
+    else:
+      # we leave the existing descriptive keys untouched and reuse the input elementIDs
+      allElementIDs = elementIDs
+
     keysToElements = createInvertedIndexAndLogTime(descriptiveKeys)
-
     clusters = {}
     elementToCluster = {}
     readClusters(existingClustersReader, clusters, elementToCluster)
@@ -196,11 +201,6 @@ def parseArguments():
   parser.add_argument('--existing-clusters', action='store', help="Optional file with existing element-cluster mapping")
   parser.add_argument('--existing-clusters-keys', action='store', help="Optional file with element-descriptive key mapping for existing clusters mapping")
   options = parser.parse_args()
-
-  if options.existing_clusters and not options.existing_clusters_keys:
-    print()
-    print(f'Existing clusters provided, but no file with descriptive keys for its elements')
-    exit(1)
 
   if options.existing_clusters_keys and not options.existing_clusters:
     print()
