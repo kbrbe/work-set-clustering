@@ -1,0 +1,48 @@
+{
+  "datePatterns": ["%Y", "(%Y)", "[%Y]", "%Y-%m-%d", "%d/%m/%Y", "%Y%m%d"],
+  "recordTag": "marc:record",
+  "recordIDExpression": "./marc:controlfield[@tag=\"001\"]",
+  "recordIDPrefix": "kbr|",
+  "singlePart": [
+    {
+      "prefix": "isni",
+      "expression": "./marc:datafield[@tag=\"024\"]/marc:subfield[@code=\"2\" and (text()=\"isni\" or text()=\"ISNI\")]/../marc:subfield[@code=\"a\"]",
+      "valueType": "text"
+    },
+    {
+      "prefix": "viaf",
+      "expression": "./marc:datafield[@tag=\"024\"]/marc:subfield[@code=\"2\" and (text()=\"viaf\" or text()=\"VIAF\")]/../marc:subfield[@code=\"a\"]",
+      "valueType": "text"
+    }
+  ],
+  "part1": [
+    {
+      "name": "mainSpelling",
+      "expression": "./marc:datafield[@tag=\"100\"]/marc:subfield[@code=\"a\"]",
+      "permutations": "True"
+    },
+    {
+      "name": "nameVariant",
+      "expression": "./marc:datafield[@tag=\"400\"]/marc:subfield[@code=\"a\"]",
+      "permutations": "True"
+    },
+    {
+      "name": "pseudonyms",
+      "expression": "./marc:datafield[@tag=\"500\"]/marc:subfield[@code=\"a\"]",
+      "permutations": "True"
+    }
+  ],
+
+  "part2": [
+    {
+      "prefix": "birthdate",
+      "expression": "./marc:datafield[@tag=\"046\"]/marc:subfield[@code=\"f\"]",
+      "valueType": "date"
+    },
+    {
+      "prefix": "deathdate",
+      "expression": "./marc:datafield[@tag=\"046\"]/marc:subfield[@code=\"g\"]",
+      "valueType": "date"
+    }
+  ]
+}
