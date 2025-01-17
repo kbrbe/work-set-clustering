@@ -3,11 +3,8 @@ import itertools
 import xml.etree.ElementTree as ET
 import unicodedata as ud
 import ast
-import numpy as np
 import enchant
 import re
-from stdnum import isbn
-from stdnum import exceptions
 
 # -----------------------------------------------------------------------------
 def parseYear(year, patterns):

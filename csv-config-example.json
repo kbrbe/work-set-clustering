@@ -1,0 +1,33 @@
+{
+  "datePatterns": ["%Y", "(%Y)", "[%Y]", "%Y-%m-%d", "%d/%m/%Y", "%Y%m%d"],
+  "recordIDColumn": "autID",
+  "recordIDPrefix": "kbr|",
+  "singlePart": [
+    {
+      "prefix": "isni",
+      "columnName": "isni"
+    },
+    {
+      "prefix": "viaf",
+      "columnName": "viaf"
+    }
+  ],
+  "part1": [
+    { "columnName": "name", "permutations": "True"},
+    { "columnName": "alternateNames", "permutations": "True"},
+    { "columnName": "pseudonyms", "permutations": "True"}
+  ],
+
+  "part2": [
+    {
+      "prefix": "birthdate",
+      "columnName": "birthDate",
+      "dataType": "date"
+    },
+    {
+      "prefix": "deathdate",
+      "columnName": "deathDate" ,
+      "dataType": "date"
+    }
+  ]
+}

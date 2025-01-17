@@ -3,10 +3,15 @@
 [![DOI](https://zenodo.org/badge/705721988.svg)](https://zenodo.org/doi/10.5281/zenodo.10011416)
 
 A Python script to perform a clustering based on descriptive keys.
-It can be used to identify _work_ clusters for _manifestations_ according to the FRBR (IFLA-LRM) model.
+It can be used to identify _work_ clusters for _manifestations_ according to the FRBR (IFLA-LRM) model. Alternatively it can be used to cluster authority records.
 
-This tool only performs the clustering. It needs a list of manifestation identifiers and their descriptive keys as input.
-If already computed cluster identifiers and descriptive keys from a previous run are provided, they can be reused.
+This repository contains several scripts:
+
+* `clustering` to perform the clustering based on a list of manifestation identifiers and their descriptive keys
+* `get-descriptive-keys-xml` to extract manifestation identifiers and description keys directly from MARCXML files
+* `get-descriptive-keys-csv` to extract manifestation identifiers and description keys from CSV files containing Python lists
+
+If already computed cluster identifiers and descriptive keys from a previous run are provided, they can be reused to extend the initial clustering.
 
 
 ## Usage via the command line
@@ -20,11 +25,42 @@ python3 -m venv py-request-isni-env
 # Activate the virtual environment
 source py-request-isni-env/bin/activate
 
-# There are no depdendenies to install
+# Install dependencies
+pip install -r requirements.txt
 
 # install the tool
 pip install .
 ```
+
+## descriptive key extraction
+
+The command-line parameters for both the XML and the CSV extraction script are the same, only the JSON configuration looks slightly different. Please have a look at the provided example configurations.
+
+Descriptive keys are created of combinations between combinations of the datafields specified in `part1`  and `part2` in the config, e.g. names and dates like `john doe/birthdate/1970-01-01`. Data fields specified in `singlePart` form a descriptive key on their own, e.g. the ISNI identifier of a person, created with a prefix, e.g. `isni/0000000000000001`
+
+If one specifies the `dataType` `date`, additional `year` descriptive keys are created. For example `john doe/birthyear/1970`.
+
+
+Available options
+
+```
+usage: get_descriptive_keys_from_xml.py [-h] -c CONFIG_FILE -o OUTPUT_FILE inputFiles [inputFiles ...]
+
+This script reads one or more XML files and based on a config creates descriptive keys of available field values
+
+positional arguments:
+  inputFiles            The inputs file containing XML records
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config-file CONFIG_FILE
+                        The config file with XPath expressions to extract
+  -o OUTPUT_FILE, --output-file OUTPUT_FILE
+                        The output CSV file containing possible descriptive keys based on the key composition config
+
+```
+
+### clustering script
 
 Available options:
 
@@ -51,7 +87,7 @@ optional arguments:
 
 ```
 
-### Clustering from scratch
+#### Clustering from scratch
 Given a CSV file where each row contains the relationship
 between one manifestation identifier and one descriptive key,
 the tool can be called the following to create cluster assignments.
@@ -79,7 +115,7 @@ Please note that all of those input files should have the same column names spec
 
 You can find more examples of cluster input in the `test/resources` directory.
 
-### Reuse existing clusters
+#### Reuse existing clusters
 
 You can reuse the clusters created from an earlier run,
 but you also have to provide the mapping between the previous elements and optionally their descriptive keys.
@@ -106,6 +142,8 @@ Similar to the initial clustering, you can provide several input files.
 ## Usage as a library
 
 The tool can also be used as a library within another Python script or a Jupyter notebook.
+
+### clustering script
 
 ```python
 from work_set_clustering.clustering import clusterFromScratch as clustering
